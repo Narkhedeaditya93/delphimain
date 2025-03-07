@@ -89,8 +89,9 @@ export function FilterPanel({ onFilterChange }: FilterPanelProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="amazon">Amazon</SelectItem>
-              <SelectItem value="ebay">eBay</SelectItem>
-              <SelectItem value="walmart">Walmart</SelectItem>
+              <SelectItem value="flipkart">Flipkart</SelectItem>
+              <SelectItem value="myntra">Myntra</SelectItem>
+              <SelectItem value="ajio">Ajio</SelectItem>
               <SelectItem value="shopify">Shopify</SelectItem>
             </SelectContent>
           </Select>

@@ -53,17 +53,23 @@ const platformDataMap = {
     scatter: generateScatterData(30),
     radar: radarData
   },
-  ebay: {
-    line: lineData.map(item => ({ ...item, trace0: item.trace0 * 0.7, trace1: item.trace1 * 0.8, trace2: item.trace2 * 0.9 })),
-    bar: barData.map(item => ({ ...item, primaryProduct: item.primaryProduct * 0.8, secondaryProduct: item.secondaryProduct * 0.7 })),
-    scatter: generateScatterData(25),
-    radar: radarData.map(item => ({ ...item, trace0: item.trace0 * 0.9, trace1: item.trace1 * 0.7, trace2: item.trace2 * 0.8 }))
+  flipkart: {
+    line: lineData.map(item => ({ ...item, trace0: item.trace0 * 0.8, trace1: item.trace1 * 0.9, trace2: item.trace2 * 0.85 })),
+    bar: barData.map(item => ({ ...item, primaryProduct: item.primaryProduct * 0.85, secondaryProduct: item.secondaryProduct * 0.8 })),
+    scatter: generateScatterData(28),
+    radar: radarData.map(item => ({ ...item, trace0: item.trace0 * 0.85, trace1: item.trace1 * 0.8, trace2: item.trace2 * 0.9 }))
   },
-  walmart: {
-    line: lineData.map(item => ({ ...item, trace0: item.trace0 * 1.2, trace1: item.trace1 * 1.1, trace2: item.trace2 * 0.95 })),
-    bar: barData.map(item => ({ ...item, primaryProduct: item.primaryProduct * 1.1, secondaryProduct: item.secondaryProduct * 1.2 })),
-    scatter: generateScatterData(40),
-    radar: radarData.map(item => ({ ...item, trace0: Math.min(1, item.trace0 * 1.1), trace1: Math.min(1, item.trace1 * 1.2), trace2: Math.min(1, item.trace2 * 1.15) }))
+  myntra: {
+    line: lineData.map(item => ({ ...item, trace0: item.trace0 * 1.1, trace1: item.trace1 * 0.95, trace2: item.trace2 * 1.05 })),
+    bar: barData.map(item => ({ ...item, primaryProduct: item.primaryProduct * 1.05, secondaryProduct: item.secondaryProduct * 1.1 })),
+    scatter: generateScatterData(35),
+    radar: radarData.map(item => ({ ...item, trace0: Math.min(1, item.trace0 * 1.05), trace1: Math.min(1, item.trace1 * 1.1), trace2: Math.min(1, item.trace2 * 1.0) }))
+  },
+  ajio: {
+    line: lineData.map(item => ({ ...item, trace0: item.trace0 * 0.75, trace1: item.trace1 * 1.2, trace2: item.trace2 * 0.9 })),
+    bar: barData.map(item => ({ ...item, primaryProduct: item.primaryProduct * 0.8, secondaryProduct: item.secondaryProduct * 1.05 })),
+    scatter: generateScatterData(22),
+    radar: radarData.map(item => ({ ...item, trace0: item.trace0 * 0.9, trace1: item.trace1 * 1.1, trace2: item.trace2 * 0.95 }))
   },
   shopify: {
     line: lineData.map(item => ({ ...item, trace0: item.trace0 * 0.6, trace1: item.trace1 * 1.3, trace2: item.trace2 * 1.1 })),
