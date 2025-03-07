@@ -9,7 +9,6 @@ import {
   ChevronRight,
   LineChart,
   PieChart,
-  Home,
   HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -49,13 +48,13 @@ export function Sidebar() {
   return (
     <div
       className={cn(
-        "flex flex-col border-r border-border bg-card transition-all duration-300 ease-in-out",
+        "flex flex-col border-r border-border bg-[#F6F6F7] transition-all duration-300 ease-in-out",
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex h-14 items-center px-4 border-b">
+      <div className="flex h-14 items-center px-4 border-b bg-white/80 backdrop-blur-sm">
         {!collapsed && (
-          <span className="text-xl font-semibold tracking-tight animate-fade-in">
+          <span className="text-xl font-semibold tracking-tight text-blue-600 animate-fade-in">
             Analytics
           </span>
         )}
@@ -80,8 +79,8 @@ export function Sidebar() {
               key={item.href}
               to={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors",
-                item.href === "/" && "bg-accent/50 font-medium text-foreground"
+                "flex items-center gap-3 rounded-md px-3 py-2 text-muted-foreground hover:bg-white hover:text-accent-foreground transition-colors",
+                item.href === "/" && "bg-white font-medium text-foreground shadow-sm"
               )}
               style={{
                 animationDelay: `${index * 50}ms`,
@@ -93,18 +92,18 @@ export function Sidebar() {
           ))}
         </nav>
       </div>
-      <div className="mt-auto border-t">
+      <div className="mt-auto border-t bg-white/50">
         <div className="grid gap-1 p-2">
           <Link
             to="/settings"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-muted-foreground hover:bg-white hover:text-accent-foreground transition-colors"
           >
             <Settings className={cn("h-5 w-5", collapsed ? "mx-auto" : "")} />
             {!collapsed && <span>Settings</span>}
           </Link>
           <Link
             to="/help"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-muted-foreground hover:bg-white hover:text-accent-foreground transition-colors"
           >
             <HelpCircle className={cn("h-5 w-5", collapsed ? "mx-auto" : "")} />
             {!collapsed && <span>Help</span>}
