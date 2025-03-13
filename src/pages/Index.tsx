@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { FilterPanel } from "@/components/dashboard/FilterPanel";
 import { ActiveFilters } from "@/components/dashboard/ActiveFilters";
@@ -8,76 +9,7 @@ import { BarChart } from "@/components/charts/BarChart";
 import { ScatterChart } from "@/components/charts/ScatterChart";
 import { RadarChart } from "@/components/charts/RadarChart";
 import { toast } from "sonner";
-
-// Sample data for the charts
-const lineData = [
-  { name: "Jan", trace0: 10, trace1: 15, trace2: 12 },
-  { name: "Feb", trace0: 15, trace1: 10, trace2: 9 },
-  { name: "Mar", trace0: 13, trace1: 5, trace2: 15 },
-  { name: "Apr", trace0: 17, trace1: 11, trace2: 12 },
-  { name: "May", trace0: 16, trace1: 9, trace2: 9 },
-  { name: "Jun", trace0: 19, trace1: 12, trace2: 14 },
-];
-
-const barData = [
-  { name: "Jan", primaryProduct: 20, secondaryProduct: 19 },
-  { name: "Feb", primaryProduct: 24, secondaryProduct: 22 },
-  { name: "Mar", primaryProduct: 18, secondaryProduct: 17 },
-  { name: "Apr", primaryProduct: 21, secondaryProduct: 20 },
-  { name: "May", primaryProduct: 19, secondaryProduct: 18 },
-  { name: "Jun", primaryProduct: 23, secondaryProduct: 21 },
-  { name: "Jul", primaryProduct: 25, secondaryProduct: 24 },
-  { name: "Aug", primaryProduct: 22, secondaryProduct: 21 },
-];
-
-const generateScatterData = (count: number) => {
-  return Array.from({ length: count }, (_, i) => ({
-    x: i + Math.random() * 5,
-    y: 4 + Math.random() * 1.5,
-    z: Math.random() * 100,
-  }));
-};
-
-const radarData = [
-  { subject: "Metric A", trace0: 0.8, trace1: 0.7, trace2: 0.9 },
-  { subject: "Metric B", trace0: 0.6, trace1: 0.9, trace2: 0.7 },
-  { subject: "Metric C", trace0: 0.9, trace1: 0.8, trace2: 0.6 },
-  { subject: "Metric D", trace0: 0.7, trace1: 0.6, trace2: 0.8 },
-  { subject: "Metric E", trace0: 0.8, trace1: 0.7, trace2: 0.7 },
-];
-
-const platformDataMap = {
-  amazon: {
-    line: lineData,
-    bar: barData,
-    scatter: generateScatterData(30),
-    radar: radarData
-  },
-  flipkart: {
-    line: lineData.map(item => ({ ...item, trace0: item.trace0 * 0.8, trace1: item.trace1 * 0.9, trace2: item.trace2 * 0.85 })),
-    bar: barData.map(item => ({ ...item, primaryProduct: item.primaryProduct * 0.85, secondaryProduct: item.secondaryProduct * 0.8 })),
-    scatter: generateScatterData(28),
-    radar: radarData.map(item => ({ ...item, trace0: item.trace0 * 0.85, trace1: item.trace1 * 0.8, trace2: item.trace2 * 0.9 }))
-  },
-  myntra: {
-    line: lineData.map(item => ({ ...item, trace0: item.trace0 * 1.1, trace1: item.trace1 * 0.95, trace2: item.trace2 * 1.05 })),
-    bar: barData.map(item => ({ ...item, primaryProduct: item.primaryProduct * 1.05, secondaryProduct: item.secondaryProduct * 1.1 })),
-    scatter: generateScatterData(35),
-    radar: radarData.map(item => ({ ...item, trace0: Math.min(1, item.trace0 * 1.05), trace1: Math.min(1, item.trace1 * 1.1), trace2: Math.min(1, item.trace2 * 1.0) }))
-  },
-  ajio: {
-    line: lineData.map(item => ({ ...item, trace0: item.trace0 * 0.75, trace1: item.trace1 * 1.2, trace2: item.trace2 * 0.9 })),
-    bar: barData.map(item => ({ ...item, primaryProduct: item.primaryProduct * 0.8, secondaryProduct: item.secondaryProduct * 1.05 })),
-    scatter: generateScatterData(22),
-    radar: radarData.map(item => ({ ...item, trace0: item.trace0 * 0.9, trace1: item.trace1 * 1.1, trace2: item.trace2 * 0.95 }))
-  },
-  shopify: {
-    line: lineData.map(item => ({ ...item, trace0: item.trace0 * 0.6, trace1: item.trace1 * 1.3, trace2: item.trace2 * 1.1 })),
-    bar: barData.map(item => ({ ...item, primaryProduct: item.primaryProduct * 0.9, secondaryProduct: item.secondaryProduct * 1.1 })),
-    scatter: generateScatterData(20),
-    radar: radarData.map(item => ({ ...item, trace0: item.trace0 * 0.8, trace1: item.trace1 * 1.2, trace2: item.trace2 * 1.0 }))
-  }
-};
+import { fetchDashboardData } from "@/services/api";
 
 const Index = () => {
   const [filters, setFilters] = useState({
@@ -86,46 +18,48 @@ const Index = () => {
     endDate: new Date(new Date().setDate(new Date().getDate() + 10)),
   });
   
-  const [chartData, setChartData] = useState({
-    line: platformDataMap.amazon.line,
-    bar: platformDataMap.amazon.bar,
-    scatter: platformDataMap.amazon.scatter,
-    radar: platformDataMap.amazon.radar
+  const { 
+    data: apiData, 
+    isLoading, 
+    isError, 
+    error, 
+    refetch 
+  } = useQuery({
+    queryKey: ['dashboardData', filters.platform, filters.startDate, filters.endDate],
+    queryFn: () => fetchDashboardData(filters.platform, filters.startDate, filters.endDate),
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   });
-  
-  const [isLoading, setIsLoading] = useState(false);
+
+  const chartData = apiData?.success && apiData.data ? apiData.data : {
+    line: [],
+    bar: [],
+    scatter: [],
+    radar: []
+  };
 
   const handleFilterChange = (newFilters: any) => {
-    setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setFilters(newFilters);
-      setChartData(platformDataMap[newFilters.platform as keyof typeof platformDataMap]);
-      setIsLoading(false);
-      
-      toast.success(`Dashboard updated with ${newFilters.platform} data`);
-    }, 800);
+    setFilters(newFilters);
+    toast.info(`Updating dashboard with ${newFilters.platform} data...`);
   };
 
   const handleClearFilters = () => {
-    setIsLoading(true);
+    const defaultFilters = {
+      platform: "amazon",
+      startDate: new Date(),
+      endDate: new Date(new Date().setDate(new Date().getDate() + 10)),
+    };
     
-    // Simulate API call
-    setTimeout(() => {
-      const defaultFilters = {
-        platform: "amazon",
-        startDate: new Date(),
-        endDate: new Date(new Date().setDate(new Date().getDate() + 10)),
-      };
-      
-      setFilters(defaultFilters);
-      setChartData(platformDataMap.amazon);
-      setIsLoading(false);
-      
-      toast.info("Filters reset to default");
-    }, 500);
+    setFilters(defaultFilters);
+    toast.info("Filters reset to default");
   };
+
+  useEffect(() => {
+    if (isError && error) {
+      toast.error(`Failed to fetch data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } else if (apiData?.success) {
+      toast.success(`Dashboard updated with ${filters.platform} data`);
+    }
+  }, [apiData, isError, error, filters.platform]);
 
   useEffect(() => {
     toast.success("Dashboard loaded successfully");
@@ -146,6 +80,13 @@ const Index = () => {
           filters={filters}
           onRemove={handleClearFilters}
         />
+
+        {isError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">Failed to load dashboard data. Please try again later.</span>
+          </div>
+        )}
 
         <div className={`grid gap-6 md:grid-cols-2 ${isLoading ? 'opacity-50 pointer-events-none' : ''} transition-opacity duration-300`}>
           <LineChart
@@ -172,6 +113,22 @@ const Index = () => {
             className="animate-fade-up"
             style={{ animationDelay: "250ms" }}
           />
+        </div>
+
+        {isLoading && (
+          <div className="flex justify-center items-center my-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        )}
+
+        <div className="flex justify-end mt-4">
+          <button 
+            onClick={() => refetch()} 
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Refreshing...' : 'Refresh Data'}
+          </button>
         </div>
       </div>
     </DashboardLayout>
