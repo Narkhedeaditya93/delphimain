@@ -96,7 +96,12 @@ const Index = () => {
     if (isError && error) {
       toast.error(`Failed to fetch data: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } else if (apiData?.success) {
-      toast.success(`Dashboard updated with ${filters.platform} data`);
+      if (apiData.error) {
+        // Show toast when using mock data as fallback
+        toast.warning(`${apiData.error}`);
+      } else {
+        toast.success(`Dashboard updated with ${filters.platform} data`);
+      }
     }
   }, [apiData, isError, error, filters.platform]);
 
@@ -124,6 +129,13 @@ const Index = () => {
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
             <strong className="font-bold">Error: </strong>
             <span className="block sm:inline">Failed to load dashboard data. Please try again later.</span>
+          </div>
+        )}
+
+        {apiData?.error && (
+          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded relative" role="alert">
+            <strong className="font-bold">Note: </strong>
+            <span className="block sm:inline">Using mock data because API connection failed. Make sure your FastAPI server is running at {API_BASE_URL}.</span>
           </div>
         )}
 
