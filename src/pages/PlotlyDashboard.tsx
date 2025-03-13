@@ -14,8 +14,8 @@ import { fetchDashboardData } from "@/services/api";
 const PlotlyDashboard = () => {
   const [filters, setFilters] = useState({
     platform: "amazon",
-    startDate: new Date(),
-    endDate: new Date(new Date().setDate(new Date().getDate() + 10)),
+    startDate: new Date(new Date().setDate(new Date().getDate() - 30)),
+    endDate: new Date(),
   });
   
   const { 
@@ -30,12 +30,51 @@ const PlotlyDashboard = () => {
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   });
 
-  const chartData = apiData?.success && apiData.data ? apiData.data : {
-    line: [],
-    bar: [],
-    scatter: [],
-    radar: []
+  // Transform API data to match chart component requirements
+  const formatChartData = () => {
+    if (!apiData?.success || !apiData.data) {
+      return {
+        line: [],
+        bar: [],
+        scatter: [],
+        radar: []
+      };
+    }
+
+    // LineChart data already matches
+    const lineData = apiData.data.line;
+
+    // BarChart data - transform to match component expectations
+    const barData = apiData.data.bar.map(item => ({
+      name: item.name,
+      primaryProduct: item.value,
+      secondaryProduct: Math.round(item.value * 0.8) // Creating secondary value for comparison
+    }));
+
+    // ScatterChart data - transform to match component expectations
+    const scatterData = apiData.data.scatter.map(item => ({
+      x: item.x,
+      y: item.y,
+      z: item.size * 4 // Scaling size for better visualization
+    }));
+
+    // RadarChart data - transform to match component expectations
+    const radarData = apiData.data.radar.map(item => ({
+      subject: item.subject,
+      trace0: item.A / 150, // Normalize to 0-1 scale
+      trace1: item.B / 150, // Normalize to 0-1 scale
+      trace2: (item.A + item.B) / (2 * 150) // Average as third trace
+    }));
+
+    return {
+      line: lineData,
+      bar: barData,
+      scatter: scatterData,
+      radar: radarData
+    };
   };
+
+  const chartData = formatChartData();
 
   const handleFilterChange = (newFilters: any) => {
     setFilters(newFilters);
@@ -45,8 +84,8 @@ const PlotlyDashboard = () => {
   const handleClearFilters = () => {
     const defaultFilters = {
       platform: "amazon",
-      startDate: new Date(),
-      endDate: new Date(new Date().setDate(new Date().getDate() + 10)),
+      startDate: new Date(new Date().setDate(new Date().getDate() - 30)),
+      endDate: new Date(),
     };
     
     setFilters(defaultFilters);
